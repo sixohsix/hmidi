@@ -22,10 +22,10 @@ mythread conn = do
 -- source / destination selection
 
 maybeRead :: Read a => String -> Maybe a
-maybeRead s = case reads s of 
+maybeRead s = case reads s of
   [(x,"")] -> Just x
   _        -> Nothing
-  
+
 select srclist = do
   names <- mapM getName srclist
   forM_ (zip [1..] names) $ \(i,name) -> putStrLn $ show i ++ ": " ++ name
@@ -37,15 +37,14 @@ select srclist = do
       putStrLn "please select a midi device"
       l <- getLine
       let k = case maybeRead l of
-        { Nothing -> nsrc
-        ; Just m  -> if m<1 || m>nsrc then nsrc else m
-        }
+                Nothing -> nsrc
+                Just m  -> if m<1 || m>nsrc then nsrc else m
       putStrLn $ "device #" ++ show k ++ " selected."
       return $ srclist!!(k-1)
   return src
-      
--- main      
-      
+
+-- main
+
 main = do
 
   srclist <- enumerateSources
@@ -55,13 +54,12 @@ main = do
   conn <- openSource src Nothing
   putStrLn "connected"
 
-  threadid <- forkIO (mythread conn) 
- 
+  threadid <- forkIO (mythread conn)
+
   start conn ; putStrLn "started. Press 'ENTER' to exit."
   getLine
   stop conn    ; putStrLn "stopped."
-  
+
   killThread threadid
-  
+
   close conn   ; putStrLn "closed."
-  
